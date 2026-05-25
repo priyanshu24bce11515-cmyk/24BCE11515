@@ -1,0 +1,16 @@
+show databases       //--> used to show the databaases present
+
+use cardetails      //---> creates a table named cardetails but temporary
+
+show dbs            //---> cardetails 
+
+db.dropDatabase()   //--> delete the table
+
+db
+
+db.createCollection("cardetails")    //--> creates a collection named cardetails
+
+db.cardetails.insert({brand:"TOYOTA"},{name:"FORTUNER"})    //---> inserting the data 
+db.cardetails.insert({brand:"BMW"},{name:"M5 CS"})
+
+db.cardetails.find()       
