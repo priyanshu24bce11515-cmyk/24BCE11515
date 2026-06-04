@@ -1,0 +1,143 @@
+package self;
+
+import com.mongodb.client.*;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import org.bson.Document;
+
+public class MongoCRUDExample {
+
+    public static void main(String[] args) {
+
+        // Connect to MongoDB
+        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+
+        // Access Database
+        MongoDatabase database = mongoClient.getDatabase("CollegeDB");
+
+        // Access Collection
+        MongoCollection<Document> collection =
+                database.getCollection("Students");
+
+        // Delete old data (optional)
+        collection.deleteMany(new Document());
+
+        // ==========================
+        // INSERT ONE
+        // ==========================
+        Document student = new Document("id", 101)
+                .append("name", "John")
+                .append("department", "CSE")
+                .append("cgpa", 8.7);
+
+        collection.insertOne(student);
+
+        // ==========================
+        // INSERT MANY
+        // ==========================
+        collection.insertMany(java.util.Arrays.asList(
+                new Document("id", 1)
+                        .append("name", "Alice"),
+
+                new Document("id", 2)
+                        .append("name", "Bob"),
+
+                new Document("id", 3)
+                        .append("name", "Charlie")
+        ));
+
+        System.out.println("Documents Inserted Successfully");
+
+        // ==========================
+        // READ ALL DOCUMENTS
+        // ==========================
+        System.out.println("\nStudent Records:");
+
+        FindIterable<Document> students = collection.find();
+
+        for (Document doc : students) {
+            System.out.println(doc.toJson());
+        }
+
+        // ==========================
+        // UPDATE ONE
+        // ==========================
+        collection.updateOne(
+                Filters.eq("id", 101),
+                Updates.set("cgpa", 9.2)
+        );
+
+        collection.updateOne(
+                Filters.eq("id", 2),
+                Updates.set("name", "Bobby")
+        );
+
+        System.out.println("\nupdateOne Executed Successfully");
+
+        // ==========================
+        // UPDATE MANY
+        // ==========================
+        collection.updateMany(
+                Filters.lt("id", 100),
+                Updates.set("department", "IT")
+        );
+
+        System.out.println("updateMany Executed Successfully");
+
+        // ==========================
+        // RENAME FIELD
+        // department -> branch
+        // ==========================
+        collection.updateOne(
+                Filters.eq("id", 101),
+                Updates.rename("department", "branch")
+        );
+
+        System.out.println("rename Executed Successfully");
+
+        // ==========================
+        // UNSET FIELD
+        // Remove cgpa
+        // ==========================
+        collection.updateOne(
+                Filters.eq("id", 101),
+                Updates.unset("cgpa")
+        );
+
+        System.out.println("unset Executed Successfully");
+
+        // ==========================
+        // DISPLAY UPDATED DOCUMENTS
+        // ==========================
+        System.out.println("\nUpdated Records:");
+
+        FindIterable<Document> updatedDocs = collection.find();
+
+        for (Document doc : updatedDocs) {
+            System.out.println(doc.toJson());
+        }
+
+        // ==========================
+        // DELETE ONE
+        // ==========================
+        collection.deleteOne(
+                Filters.eq("id", 3)
+        );
+
+        System.out.println("\nDocument Deleted Successfully");
+
+        // ==========================
+        // FINAL RECORDS
+        // ==========================
+        System.out.println("\nFinal Records:");
+
+        FindIterable<Document> finalDocs = collection.find();
+
+        for (Document doc : finalDocs) {
+            System.out.println(doc.toJson());
+        }
+
+        // Close Connection
+        mongoClient.close();
+    }
+}
